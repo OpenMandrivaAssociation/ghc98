@@ -22,6 +22,7 @@ BuildRequires:	make
 BuildRequires:	python
 BuildRequires:	perl
 BuildRequires:	autoconf
+BuildRequires:	automake
 BuildRequires:	patch
 BuildRequires:	gcc
 BuildRequires:	lld

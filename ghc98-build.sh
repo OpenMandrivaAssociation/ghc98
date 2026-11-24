@@ -58,6 +58,7 @@ ver=$("$GHC" --numeric-version | tr -d '[:space:]') || fail "ghc94 did not run"
 [ -e "$GMP_LIB/libgmp.so" ] || fail "libgmp.so missing"
 command -v python >/dev/null || fail "python missing"
 command -v autoconf >/dev/null || fail "autoconf missing"
+command -v aclocal >/dev/null || fail "aclocal missing"
 command -v perl >/dev/null || fail "perl missing"
 command -v patch >/dev/null || fail "patch missing"
 [ -x /usr/bin/gcc ] || fail "/usr/bin/gcc missing"
@@ -236,7 +237,7 @@ phase "hadrian -j$JOBS binary-dist"
 if ! stdbuf -oL -eL hadrian/_build/bin/hadrian -j"$JOBS" --flavour="$FLAVOUR" --docs=none binary-dist-dir \
 	> "$WORK/logs/make.log" 2>&1
 then
-	fail "hadrian build: $(tail -30 "$WORK/logs/make.log" | tr '\n' ' ' | cut -c1-800)"
+	fail "hadrian build: $(tail -c 1800 "$WORK/logs/make.log" | tr '\n' ' ')"
 fi
 phase "binary-dist rc=0"
 
