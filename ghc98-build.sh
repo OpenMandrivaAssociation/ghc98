@@ -29,6 +29,9 @@ export LANG=C.UTF-8
 export LC_ALL=C.UTF-8
 unset LD_LIBRARY_PATH || true
 unset GHC_PACKAGE_PATH || true
+# rpm exports optflags as CFLAGS and LDFLAGS, including -flto and
+# -Werror=format-security. Those flags fail GHC's configure probes.
+unset CFLAGS CXXFLAGS LDFLAGS CPPFLAGS RPM_OPT_FLAGS RPM_LD_FLAGS || true
 
 phase() { printf 'GHC98_PHASE %s %s\n' "$(date '+%Y-%m-%d %H:%M:%S')" "$*"; }
 failed=0
@@ -182,7 +185,7 @@ if ! ./configure --prefix="$PREFIX" GHC="$GHC" CC="$WORK/bin/gcc" \
 	--with-gmp-includes="$GMP_INC" --with-gmp-libraries="$GMP_LIB" \
 	> "$WORK/logs/configure.log" 2>&1
 then
-	fail "configure: $(tail -20 "$WORK/logs/configure.log" | tr '\n' ' ' | cut -c1-700)"
+	fail "configure: $({ grep -E 'error:|Error |needed|cannot |Failed' "$WORK/logs/configure.log" || true; tail -15 "$WORK/logs/configure.log"; } | tr '\n' ' ' | cut -c1-2000)"
 fi
 grep -F "GHC=$GHC" config.log >/dev/null || fail "config.log did not record ghc94"
 grep -F "$TOOLS/bin/happy" hadrian/cfg/system.config >/dev/null || fail "system.config did not record happy"
